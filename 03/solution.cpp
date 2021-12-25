@@ -1,7 +1,10 @@
+#include <algorithm>
+#include <bitset>
 #include <fstream>
 #include <functional>
 #include <iostream>
 #include <unordered_map>
+#include <vector>
 
 using namespace std;
 
@@ -26,13 +29,41 @@ int compute_decimal_value(unordered_map<int, int>& counts, function<bool(int)> c
     return value;
 }
 
+string compute_part_2_ratings(vector<string>& numbers, function<bool(int, int)> comparator) {
+    int i = 0;
+    vector<string>::iterator lo = numbers.begin();
+    vector<string>::iterator hi = numbers.end();
+    while (lo < (hi - 1)) {
+        int count = 0;
+        auto curr = lo;
+        for (; curr < hi; curr++) {
+           // cout << "iteration " << i << ": " << *curr << endl;
+           if ((*curr).at(i) != '0') {
+               break;
+           }
+           count++;
+        }
+
+        int half = (hi - lo) / 2;
+        // cout << "count: " << count << " half: " << half << " curr: " << (curr - lo) << endl;
+        if (comparator(count, half)) {
+            // cout << "if statement evaluated to true" << endl;
+            lo = curr;
+        } else {
+            // cout << "else statement evaluated to true" << endl;
+            hi = curr;
+        }
+        i++;
+    }
+    return *lo;
+}
+
 int part1(ifstream&& ifs) {
     if (!ifs) {
         cerr << "Couldn't open input file" << endl;
     }
 
     string line;
-    char* token;
     unordered_map<int, int> counts;
     while (getline(ifs, line)) {
         const char* line_arr = line.c_str();
@@ -50,9 +81,31 @@ int part1(ifstream&& ifs) {
     return gamma * epsilon;
 }
 
+int part2(ifstream&& ifs) {
+    if (!ifs) {
+        cerr << "Couldn't open input file" << endl;
+    }
+
+    string line;
+    vector<string> numbers;
+    while (getline(ifs, line)) {
+        numbers.push_back(line);
+    }
+    sort(numbers.begin(), numbers.end());
+
+    string oxygen = compute_part_2_ratings(numbers, [](int count, int half) { return count <= half; });
+    string co2 = compute_part_2_ratings(numbers, [](int count, int half) { return count > half; });
+
+    cout << "Oxygen " << oxygen << " CO2 " << co2 << endl;
+    return stoi(oxygen, nullptr, 2) * stoi(co2, nullptr, 2);
+}
+
 int main() {
     string filename = "input.txt";
     ifstream&& ifs {filename};
 
-    cout << "Answer: " << part1(ifstream(filename)) << endl;
+    int part1_answer = part1(ifstream(filename));
+    cout << "Answer: " << part1_answer << endl;
+    int part2_answer = part2(ifstream(filename));
+    cout << "Answer: " << part2_answer << endl;
 }
