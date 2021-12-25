@@ -10,7 +10,7 @@ enum Direction { none, forward, up, down };
 
 int part1(ifstream&& ifs) {
     if (!ifs) {
-        cerr << "Couldn't open input file for part 1" << endl;
+        cerr << "Couldn't open input file" << endl;
     }
 
     string line;
@@ -50,7 +50,7 @@ int part1(ifstream&& ifs) {
 
 int part2(ifstream&& ifs) {
     if (!ifs) {
-        cerr << "Couldn't open input file for part 1" << endl;
+        cerr << "Couldn't open input" << endl;
     }
 
     string line;
