@@ -1,9 +1,7 @@
 #include <fstream>
 #include <iostream>
-#include <locale>
 #include <string.h>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 
 using namespace std;
@@ -126,6 +124,31 @@ bool isalnum(string str) {
   return false;
 }
 
+vector<Board> parse_boards(ifstream &&ifs, string &line) {
+  vector<Board> boards;
+  vector<vector<Square>> values;
+  int row = 0;
+  while (getline(ifs, line)) {
+    if (!isalnum(line)) {
+      if (values.size() > 0) {
+        boards.push_back(Board(values));
+        values.clear();
+      }
+      row = 0;
+      continue;
+    }
+    char *num = strtok(&line[0], " ");
+    vector<Square> row_squares;
+    while (num != nullptr) {
+      row_squares.push_back(Square(stoi(num, nullptr, 10)));
+      num = strtok(nullptr, " ");
+    }
+    values.push_back(row_squares);
+    row++;
+  }
+  return boards;
+}
+
 void draw_num_for_all_boards(vector<Board>& boards, int num) {
   for (auto& board : boards) {
     board.draw_number(num);
@@ -169,28 +192,36 @@ int part1(ifstream &&ifs) {
     token = strtok(nullptr, ",");
   }
 
-  // Parse all the boards
-  vector<Board> boards;
-  vector<vector<Square>> values;
-  int row = 0;
-  while (getline(ifs, line)) {
-    if (!isalnum(line)) {
-      if (values.size() > 0) {
-        boards.push_back(Board(values));
-        values.clear();
-      }
-      row = 0;
-      continue;
+  vector<Board> boards = parse_boards(move(ifs), line);
+
+  for (auto num : numbers_drawn) {
+    draw_num_for_all_boards(boards, num);
+    int result = check_bingo_for_all_boards(boards);
+    if (result > 0) {
+      return result * num;
     }
-    char *num = strtok(&line[0], " ");
-    vector<Square> row_squares;
-    while (num != nullptr) {
-      row_squares.push_back(Square(stoi(num, nullptr, 10)));
-      num = strtok(nullptr, " ");
-    }
-    values.push_back(row_squares);
-    row++;
   }
+}
+
+int part2(ifstream &&ifs) {
+  if (!ifs) {
+    cerr << "Couldn't open input file" << endl;
+  }
+
+  string line;
+
+  // Parse first line to get the numbers drawn
+  getline(ifs, line);
+
+  char *token;
+  vector<int> numbers_drawn;
+  token = strtok(&line[0], ",");
+  while (token != nullptr) {
+    numbers_drawn.push_back(stoi(token, nullptr, 10));
+    token = strtok(nullptr, ",");
+  }
+
+  vector<Board> boards = parse_boards(move(ifs), line);
 
   for (auto num : numbers_drawn) {
     draw_num_for_all_boards(boards, num);
@@ -203,7 +234,6 @@ int part1(ifstream &&ifs) {
 
 int main() {
   string filename = "input.txt";
-  ifstream &&ifs{filename};
 
   int part1_answer = part1(ifstream(filename));
   cout << "Answer: " << part1_answer << endl;
