@@ -11,17 +11,11 @@ public:
   Square(int num) : number{num}, drawn{false} {}
   Square(int num, bool drawn) : number{num}, drawn{drawn} {}
 
-  int get_num() {
-    return number;
-  }
+  int get_num() { return number; }
 
-  bool is_drawn() {
-    return drawn;
-  }
+  bool is_drawn() { return drawn; }
 
-  bool draw() {
-    drawn = true;
-  }
+  bool draw() { drawn = true; }
 
 private:
   int number;
@@ -43,13 +37,11 @@ public:
     if (value_to_indices.count(num) == 0) {
       return;
     }
-    auto& indices = value_to_indices.at(num);
+    auto &indices = value_to_indices.at(num);
     values.at(indices.first).at(indices.second).draw();
   }
 
-  vector<vector<Square>> get_squares() {
-    return values;
-  }
+  vector<vector<Square>> get_squares() { return values; }
 
   bool check_bingo() {
     bool found_bingo;
@@ -116,9 +108,9 @@ bool isalnum(string str) {
   int i = 0;
 
   while (i < str.length()) {
-      if (std::isalnum(str[i])) {
-        return true;
-      }
+    if (std::isalnum(str[i])) {
+      return true;
+    }
     ++i;
   }
   return false;
@@ -149,19 +141,19 @@ vector<Board> parse_boards(ifstream &&ifs, string &line) {
   return boards;
 }
 
-void draw_num_for_all_boards(vector<Board>& boards, int num) {
-  for (auto& board : boards) {
+void draw_num_for_all_boards(vector<Board> &boards, int num) {
+  for (auto &board : boards) {
     board.draw_number(num);
   }
 }
 
-int check_bingo_for_all_boards(vector<Board>& boards) {
-  for (auto& board : boards) {
+int check_bingo_for_all_boards(vector<Board> &boards) {
+  for (auto &board : boards) {
     if (board.check_bingo()) {
       vector<vector<Square>> squares = board.get_squares();
       int sum_unmarked = 0;
-      for (auto& square_row : squares) {
-        for (auto& square : square_row) {
+      for (auto &square_row : squares) {
+        for (auto &square : square_row) {
           if (!square.is_drawn()) {
             sum_unmarked += square.get_num();
           }
@@ -173,6 +165,26 @@ int check_bingo_for_all_boards(vector<Board>& boards) {
   return -1;
 }
 
+void check_bingo_for_all_boards(vector<Board> &boards,
+                                unordered_map<int, int> &winning_boards,
+                                int num) {
+  for (int i = 0; i < boards.size(); i++) {
+    auto &board = boards.at(i);
+    if (winning_boards.count(i) == 0 && board.check_bingo()) {
+      vector<vector<Square>> squares = board.get_squares();
+      int sum_unmarked = 0;
+      for (auto &square_row : squares) {
+        for (auto &square : square_row) {
+          if (!square.is_drawn()) {
+            sum_unmarked += square.get_num();
+          }
+        }
+      }
+      cout << i << " " << (sum_unmarked * num) << endl;
+      winning_boards.insert({i, sum_unmarked});
+    }
+  }
+}
 
 int part1(ifstream &&ifs) {
   if (!ifs) {
@@ -203,7 +215,7 @@ int part1(ifstream &&ifs) {
   }
 }
 
-int part2(ifstream &&ifs) {
+void part2(ifstream &&ifs) {
   if (!ifs) {
     cerr << "Couldn't open input file" << endl;
   }
@@ -221,14 +233,13 @@ int part2(ifstream &&ifs) {
     token = strtok(nullptr, ",");
   }
 
+  unordered_map<int, int> winning_boards;
   vector<Board> boards = parse_boards(move(ifs), line);
 
   for (auto num : numbers_drawn) {
     draw_num_for_all_boards(boards, num);
-    int result = check_bingo_for_all_boards(boards);
-    if (result > 0) {
-      return result * num;
-    }
+    check_bingo_for_all_boards(boards, winning_boards, num);
+    //    cout << result * num << endl;;
   }
 }
 
@@ -237,4 +248,5 @@ int main() {
 
   int part1_answer = part1(ifstream(filename));
   cout << "Answer: " << part1_answer << endl;
+  part2(ifstream(filename));
 }
