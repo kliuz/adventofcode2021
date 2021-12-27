@@ -110,7 +110,6 @@ int part2(ifstream &&ifs) {
 
 int main() {
   string filename = "input.txt";
-  ifstream &&ifs{filename};
 
   int part1_answer = part1(ifstream(filename));
   cout << "Answer: " << part1_answer << endl;

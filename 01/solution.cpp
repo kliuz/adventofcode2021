@@ -53,7 +53,6 @@ int part2(ifstream &&ifs, int window_size) {
 
 int main() {
   string filename = "input.txt";
-  ifstream &&ifs{filename};
 
   cout << "Number of increases: " << part1(ifstream(filename)) << endl;
   cout << "Number of increases: " << part2(ifstream(filename), 3) << endl;
