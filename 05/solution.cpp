@@ -23,7 +23,7 @@ void insert_or_update(
   if (coord_to_lines.count(coord) == 0) {
     coord_to_lines.insert({coord, 1});
   } else {
-    int& num_intersections = coord_to_lines.at(coord);
+    int &num_intersections = coord_to_lines.at(coord);
     num_intersections += 1;
   }
 }
@@ -60,7 +60,7 @@ int part1(ifstream &&ifs) {
   }
 
   int count = 0;
-  for (auto& entry : coord_to_lines) {
+  for (auto &entry : coord_to_lines) {
     if (entry.second >= 2) {
       count++;
     }
@@ -98,26 +98,30 @@ int part2(ifstream &&ifs) {
         insert_or_update(coord_to_lines, make_pair(i, start.second));
       }
     } else if (start.first > end.first && start.second > end.second) {
-      for (int i = start.first, j = start.second; i >= end.first && j >= end.second; i--, j--) {
+      for (int i = start.first, j = start.second;
+           i >= end.first && j >= end.second; i--, j--) {
         insert_or_update(coord_to_lines, make_pair(i, j));
       }
     } else if (start.first > end.first && start.second < end.second) {
-      for (int i = start.first, j = start.second; i >= end.first && j <= end.second; i--, j++) {
+      for (int i = start.first, j = start.second;
+           i >= end.first && j <= end.second; i--, j++) {
         insert_or_update(coord_to_lines, make_pair(i, j));
       }
     } else if (start.first < end.first && start.second > end.second) {
-      for (int i = start.first, j = start.second; i <= end.first && j >= end.second; i++, j--) {
+      for (int i = start.first, j = start.second;
+           i <= end.first && j >= end.second; i++, j--) {
         insert_or_update(coord_to_lines, make_pair(i, j));
       }
     } else if (start.first < end.first && start.second < end.second) {
-      for (int i = start.first, j = start.second; i <= end.first && j <= end.second; i++, j++) {
+      for (int i = start.first, j = start.second;
+           i <= end.first && j <= end.second; i++, j++) {
         insert_or_update(coord_to_lines, make_pair(i, j));
       }
     }
   }
 
   int count = 0;
-  for (auto& entry : coord_to_lines) {
+  for (auto &entry : coord_to_lines) {
     if (entry.second >= 2) {
       count++;
     }
